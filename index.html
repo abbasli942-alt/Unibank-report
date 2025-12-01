@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UniBank Strategic Landscape: Porter's Forces</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f5f5f4; /* Stone 100 - Warm Neutral */
+            color: #1c1917; /* Stone 900 */
+        }
+
+        /* Custom Scrollbar for text panels */
+        .custom-scroll::-webkit-scrollbar {
+            width: 6px;
+        }
+        .custom-scroll::-webkit-scrollbar-track {
+            background: #e7e5e4;
+        }
+        .custom-scroll::-webkit-scrollbar-thumb {
+            background-color: #a8a29e;
+            border-radius: 20px;
+        }
+
+        /* Chart Container Strict Styling */
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 350px; 
+            max-height: 400px;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 400px;
+            }
+        }
+
+        .card-hover {
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .card-hover:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+
+        .active-tab {
+            background-color: #e7e5e4; /* Stone 200 */
+            border-left: 4px solid #ea580c; /* Orange 600 */
+            font-weight: 600;
+        }
+        .inactive-tab {
+            border-left: 4px solid transparent;
+        }
+        .inactive-tab:hover {
+            background-color: #f5f5f4;
+        }
+    </style>
+    <!-- Chosen Palette: Warm Neutrals (Stone) with Burnt Orange and Slate accents for professionalism and calm harmony. -->
+    
+    <!-- Application Structure Plan: 
+         1. Header: Clear context and title.
+         2. Strategic Radar (The Core): A prominent Radar Chart visualizing the intensity of the 6 forces (including Stakeholders). This provides an immediate visual summary of the pressure points.
+         3. Interactive Explorer: A split-view layout. On the left/top, the Radar chart acts as a navigator. On the right/bottom, a detailed content panel updates based on the selected force. This allows users to correlate the visual intensity with qualitative factors.
+         4. Market Context (Quantitative): A section dedicated to the specific data points mentioned (Assets, Rankings, Growth) using a Bar chart to contextualize UniBank's position against incumbents.
+         5. Key Insights Grid: Cards extracting the "Key Factors" into digestible, categorized bites (Barriers, Digital War, Regulation).
+         6. Conclusion: A synthesis block.
+         This structure prioritizes the "Assessment" (High/Low) first, then allows drill-down into "Why" (Factors).
+    -->
+
+    <!-- Visualization & Content Choices:
+         1. Radar Chart: Goal -> Compare Force Intensities. Method -> Chart.js Radar. Interaction -> Click point to view details. Justification -> Porter's models are multi-dimensional; radar is ideal for showing the "shape" of competition.
+         2. Bar Chart (Horizontal): Goal -> Show Market Position. Method -> Chart.js Bar. Interaction -> Tooltips. Justification -> Visualizing "7th largest" vs "Dominant Incumbents" emphasizes the "Rivalry" force.
+         3. Dynamic Text Panels: Goal -> Inform/Deep Dive. Method -> JS DOM Manipulation. Interaction -> Updates on chart click/tab click. Justification -> Keeps the interface clean, preventing text walls.
+         4. Unicode Icons: Goal -> Visual cues. Method -> HTML entities. Justification -> No SVG required, lightweight.
+    -->
+    
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+</head>
+<body class="min-h-screen flex flex-col">
+
+    <!-- Header Section -->
+    <header class="bg-white shadow-sm border-b border-stone-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+            <div class="flex flex-col md:flex-row md:items-center md:justify-between">
+                <div>
+                    <h1 class="text-3xl font-bold text-stone-800 tracking-tight">UniBank Strategic Landscape</h1>
+                    <p class="mt-1 text-sm text-stone-500">Azerbaijan Banking Sector • Porter’s 5+1 Forces Analysis</p>
+                </div>
+                <div class="mt-4 md:mt-0 flex gap-2">
+                    <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-stone-100 text-stone-800">
+                        Asset Rank: #7
+                    </span>
+                    <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-stone-100 text-stone-800">
+                        Assets: 1.81 bn AZN
+                    </span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="flex-grow max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-12">
+
+        <!-- Intro Text -->
+        <section>
+            <div class="bg-white rounded-lg shadow-sm p-6 border border-stone-200">
+                <h2 class="text-xl font-semibold text-stone-800 mb-2">Executive Summary</h2>
+                <p class="text-stone-600 leading-relaxed">
+                    This interactive dashboard dissects the competitive forces shaping UniBank's strategy in the Azerbaijani market. 
+                    While regulatory barriers protect the sector, rivalry is intense among existing players fighting for digital supremacy. 
+                    UniBank faces a landscape defined by high state influence and a race to capture retail loyalty through UX and pricing.
+                    Explore the forces below to understand the dynamics at play.
+                </p>
+            </div>
+        </section>
+
+        <!-- Main Interactive Section: Radar & Details -->
+        <section class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+            
+            <!-- Left Column: Radar Visualization -->
+            <div class="lg:col-span-5 flex flex-col">
+                <div class="bg-white rounded-lg shadow-lg border border-stone-200 p-4 h-full">
+                    <div class="mb-4">
+                        <h3 class="text-lg font-bold text-stone-800">Force Intensity Radar</h3>
+                        <p class="text-xs text-stone-500">Click on a point or label to view detailed factors.</p>
+                    </div>
+                    
+                    <!-- Chart Container -->
+                    <div class="chart-container">
+                        <canvas id="forcesRadarChart"></canvas>
+                    </div>
+
+                    <!-- Legend / Control Guidance -->
+                    <div class="mt-4 flex flex-wrap justify-center gap-2 text-xs text-stone-400">
+                        <span class="flex items-center"><span class="w-2 h-2 rounded-full bg-red-500 mr-1"></span>High Threat</span>
+                        <span class="flex items-center"><span class="w-2 h-2 rounded-full bg-yellow-500 mr-1"></span>Moderate</span>
+                        <span class="flex items-center"><span class="w-2 h-2 rounded-full bg-green-500 mr-1"></span>Low</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Column: Contextual Details Panel -->
+            <div class="lg:col-span-7 flex flex-col">
+                <div class="bg-white rounded-lg shadow-lg border border-stone-200 flex flex-col h-full overflow-hidden">
+                    <!-- Tabs for Mobile/Alternative Nav -->
+                    <div class="flex overflow-x-auto border-b border-stone-200 p-2 gap-1" id="navTabs">
+                        <!-- Populated by JS -->
+                    </div>
+
+                    <!-- Dynamic Content Area -->
+                    <div class="p-6 flex-grow flex flex-col" id="detailPanel">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 id="detailTitle" class="text-2xl font-bold text-stone-800">Select a Force</h3>
+                            <span id="detailLevel" class="px-3 py-1 rounded-full text-sm font-semibold bg-stone-100 text-stone-600">--</span>
+                        </div>
+                        
+                        <div class="prose prose-stone max-w-none flex-grow custom-scroll overflow-y-auto pr-2" id="detailContent">
+                            <p class="text-stone-500 italic">Interact with the Radar Chart on the left or the tabs above to explore the detailed analysis for each of Porter's Forces.</p>
+                        </div>
+
+                        <!-- Actionable Takeaway Box -->
+                        <div class="mt-6 p-4 bg-orange-50 rounded-md border border-orange-100">
+                            <h4 class="text-sm font-bold text-orange-800 uppercase tracking-wide mb-1">Strategic Implication</h4>
+                            <p id="detailImplication" class="text-sm text-orange-900">Select a force to see the strategic implication.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Secondary Data Visualization: Market Context -->
+        <section>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <!-- Market Position Chart -->
+                <div class="bg-white rounded-lg shadow-sm border border-stone-200 p-6">
+                    <h3 class="text-lg font-bold text-stone-800 mb-2">Market Position & Rivalry</h3>
+                    <p class="text-sm text-stone-500 mb-4">Visualizing the "Rivalry" force: UniBank vs. Market Leaders.</p>
+                    
+                    <div class="chart-container h-64 md:h-72">
+                        <canvas id="marketBarChart"></canvas>
+                    </div>
+                    <p class="text-xs text-stone-400 mt-2 text-center">*Market share conceptualized based on "dominance" of top 3 vs UniBank's 7th rank.</p>
+                </div>
+
+                <!-- Digital Transition Stats -->
+                <div class="bg-white rounded-lg shadow-sm border border-stone-200 p-6 flex flex-col justify-center">
+                    <h3 class="text-lg font-bold text-stone-800 mb-4">Digital Shift & Customer Behavior</h3>
+                    <p class="text-sm text-stone-500 mb-6">Key metrics influencing Buyer Power and Substitutes.</p>
+                    
+                    <div class="space-y-6">
+                        <!-- Stat 1 -->
+                        <div>
+                            <div class="flex justify-between items-end mb-1">
+                                <span class="text-sm font-medium text-stone-600">Depositor Growth (YoY)</span>
+                                <span class="text-lg font-bold text-green-600">+11.7%</span>
+                            </div>
+                            <div class="w-full bg-stone-100 rounded-full h-2.5">
+                                <div class="bg-green-500 h-2.5 rounded-full" style="width: 75%"></div>
+                            </div>
+                            <p class="text-xs text-stone-400 mt-1">Indicates shrinking "mattress" savings (Substitutes).</p>
+                        </div>
+
+                        <!-- Stat 2 -->
+                        <div>
+                            <div class="flex justify-between items-end mb-1">
+                                <span class="text-sm font-medium text-stone-600">Deposit Volume Growth</span>
+                                <span class="text-lg font-bold text-stone-800">+5.3%</span>
+                            </div>
+                            <div class="w-full bg-stone-100 rounded-full h-2.5">
+                                <div class="bg-stone-500 h-2.5 rounded-full" style="width: 45%"></div>
+                            </div>
+                        </div>
+
+                        <!-- Stat 3 -->
+                        <div>
+                            <div class="flex justify-between items-end mb-1">
+                                <span class="text-sm font-medium text-stone-600">Retail Deposit Trend</span>
+                                <span class="text-sm font-bold text-blue-600">Rising (AZN)</span>
+                            </div>
+                            <p class="text-xs text-stone-500 mt-1">Shift towards local currency, though Corp remains FX heavy.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Analysis Grid: The "Why" behind the "What" -->
+        <section>
+            <h3 class="text-xl font-bold text-stone-800 mb-6">Deep Dive: Critical Success Factors</h3>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <!-- Card 1 -->
+                <div class="bg-white p-6 rounded-lg border-t-4 border-blue-500 shadow-sm card-hover">
+                    <div class="flex items-center justify-between mb-3">
+                        <h4 class="font-bold text-stone-800">Regulation & State</h4>
+                        <span class="text-2xl">🏛️</span>
+                    </div>
+                    <p class="text-sm text-stone-600 mb-3">The CBA acts as a high-impact stakeholder. Strict capital requirements protect incumbents from new entrants but also limit risk appetite.</p>
+                    <ul class="text-xs text-stone-500 list-disc ml-4 space-y-1">
+                        <li>Macroprudential rules</li>
+                        <li>De-dollarization policy</li>
+                    </ul>
+                </div>
+
+                <!-- Card 2 -->
+                <div class="bg-white p-6 rounded-lg border-t-4 border-red-500 shadow-sm card-hover">
+                    <div class="flex items-center justify-between mb-3">
+                        <h4 class="font-bold text-stone-800">The Digital War</h4>
+                        <span class="text-2xl">📱</span>
+                    </div>
+                    <p class="text-sm text-stone-600 mb-3">With 20+ banks and low switching costs, the battleground has shifted to UX, Mobile Apps, and Cashback/Bonuses.</p>
+                    <ul class="text-xs text-stone-500 list-disc ml-4 space-y-1">
+                        <li>Fintech entry threat</li>
+                        <li>Price sensitivity rising</li>
+                    </ul>
+                </div>
+
+                <!-- Card 3 -->
+                <div class="bg-white p-6 rounded-lg border-t-4 border-yellow-500 shadow-sm card-hover">
+                    <div class="flex items-center justify-between mb-3">
+                        <h4 class="font-bold text-stone-800">Funding Dilemma</h4>
+                        <span class="text-2xl">💰</span>
+                    </div>
+                    <p class="text-sm text-stone-600 mb-3">Dependence on household deposits creates a "duration mismatch". Plenty of short-term cash, but a shortage of "long money" for lending.</p>
+                    <ul class="text-xs text-stone-500 list-disc ml-4 space-y-1">
+                        <li>Corporate FX dominance</li>
+                        <li>Vendor dependence</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="bg-stone-900 text-stone-400 py-8 mt-12">
+        <div class="max-w-7xl mx-auto px-4 text-center">
+            <p class="text-sm">Generated Analysis based on Porter's Forces Report for UniBank (Azerbaijan).</p>
+            <p class="text-xs mt-2 text-stone-600">Sources: Report.az, Oxu.Az, Trend, Uploads Cbar</p>
+        </div>
+    </footer>
+
+    <!-- JS Logic -->
+    <script>
+        // Data Store
+        const forcesData = [
+            {
+                id: 'entrants',
+                label: 'New Entrants',
+                level: 'Low to Moderate',
+                score: 3, // For chart (1-10)
+                color: 'rgb(34, 197, 94)', // green
+                icon: '🛡️',
+                factors: [
+                    '<strong>High Barriers:</strong> Strict banking license/capital reqs & tight CBA regulation.',
+                    '<strong>Incumbent Power:</strong> ABB, Kapital, and PASHA already dominate assets/distribution.',
+                    '<strong>Disruption Risk:</strong> Digital-only models/neobanks lower entry barriers specifically for retail.'
+                ],
+                implication: 'Focus on digital defense. While regulation protects the core banking license, the retail interface is vulnerable to agile fintechs.'
+            },
+            {
+                id: 'rivalry',
+                label: 'Rivalry',
+                level: 'High',
+                score: 9, 
+                color: 'rgb(239, 68, 68)', // red
+                icon: '⚔️',
+                factors: [
+                    '<strong>Fragmentation:</strong> 20+ banks in a small market. UniBank is #7 (1.81bn AZN).',
+                    '<strong>Commodification:</strong> Core products (cards, loans) are similar. Competition shifts to Price, UX, and Cashback.',
+                    '<strong>Digital Convergence:</strong> All majors are digitizing, eroding early-mover advantages.'
+                ],
+                implication: 'Differentiation is critical. Since product innovation is easily copied, UniBank must compete on Customer Experience (CX) and loyalty ecosystems.'
+            },
+            {
+                id: 'substitutes',
+                label: 'Substitutes',
+                level: 'Moderate',
+                score: 5,
+                color: 'rgb(234, 179, 8)', // yellow
+                icon: '🔄',
+                factors: [
+                    '<strong>Cash to Digital:</strong> "Under mattress" savings shrinking; depositors up +11.7%.',
+                    '<strong>Alternative Channels:</strong> MFIs and Big Tech payments offer loans/payment rails.',
+                    '<strong>Stickiness:</strong> Banks remain the primary trust anchor for large savings and mortgages.'
+                ],
+                implication: 'Capture the cash-to-digital transition. Ensure the onboarding process is seamless to capture new depositors leaving the informal economy.'
+            },
+            {
+                id: 'suppliers',
+                label: 'Suppliers',
+                level: 'Moderate',
+                score: 5,
+                color: 'rgb(234, 179, 8)', // yellow
+                icon: '🏗️',
+                factors: [
+                    '<strong>Funding Mix:</strong> Heavy reliance on household deposits (15+ bn AZN sector-wide).',
+                    '<strong>Duration Mismatch:</strong> Deposits are short-term; shortage of "long money" for lending.',
+                    '<strong>Tech Dependency:</strong> Reliance on international card schemes/core banking vendors for innovation.'
+                ],
+                implication: 'Diversify funding sources. Develop products that encourage longer-term deposits to fix the asset-liability duration mismatch.'
+            },
+            {
+                id: 'buyers',
+                label: 'Buyers',
+                level: 'Mod to High',
+                score: 7,
+                color: 'rgb(249, 115, 22)', // orange
+                icon: '🛒',
+                factors: [
+                    '<strong>Low Switching Costs:</strong> Retail clients can easily open new accounts via app.',
+                    '<strong>Rate Shopping:</strong> Digital literacy enables quick comparison of fees and rates.',
+                    '<strong>Corporate Power:</strong> Large clients negotiate aggressively on loan margins.'
+                ],
+                implication: 'Increase switching costs through "sticky" value-adds (e.g., ecosystem integration, superior mobile app features) rather than just pricing.'
+            },
+            {
+                id: 'stakeholders',
+                label: 'Stakeholders',
+                level: 'High',
+                score: 9,
+                color: 'rgb(239, 68, 68)', // red
+                icon: '⚖️',
+                factors: [
+                    '<strong>Regulator (CBA):</strong> Macroprudential rules & de-dollarization dictate strategy.',
+                    '<strong>Global Policy:</strong> IMF/IFIs push for financial stability affects risk appetite.',
+                    '<strong>Trust:</strong> Reputational risk is paramount as society shifts to banking trust.'
+                ],
+                implication: 'Compliance is not just legal, it\'s strategic. Align product mix with state goals (e.g., de-dollarization) to ensure regulatory favor.'
+            }
+        ];
+
+        // --- Chart 1: Radar Chart (Forces) ---
+        const ctxRadar = document.getElementById('forcesRadarChart').getContext('2d');
+        const radarChart = new Chart(ctxRadar, {
+            type: 'radar',
+            data: {
+                labels: forcesData.map(d => d.label),
+                datasets: [{
+                    label: 'Force Intensity',
+                    data: forcesData.map(d => d.score),
+                    fill: true,
+                    backgroundColor: 'rgba(234, 88, 12, 0.2)', // Orange 600 transparent
+                    borderColor: 'rgb(234, 88, 12)',
+                    pointBackgroundColor: 'rgb(255, 255, 255)',
+                    pointBorderColor: '#ea580c',
+                    pointHoverBackgroundColor: '#ea580c',
+                    pointHoverBorderColor: '#fff',
+                    pointRadius: 5,
+                    pointHoverRadius: 8
+                }]
+            },
+            options: {
+                maintainAspectRatio: false,
+                responsive: true,
+                scales: {
+                    r: {
+                        angleLines: { color: '#e5e7eb' },
+                        grid: { color: '#e5e7eb' },
+                        pointLabels: {
+                            font: { size: 12, weight: 'bold' },
+                            color: '#44403c'
+                        },
+                        suggestedMin: 0,
+                        suggestedMax: 10,
+                        ticks: { display: false } // Hide numbers on axis for cleaner look
+                    }
+                },
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                const force = forcesData[context.dataIndex];
+                                return `${force.label}: ${force.level}`;
+                            }
+                        }
+                    }
+                },
+                onClick: (e) => {
+                    const points = radarChart.getElementsAtEventForMode(e, 'nearest', { intersect: true }, true);
+                    if (points.length) {
+                        updateDetails(points[0].index);
+                    }
+                }
+            }
+        });
+
+        // --- Chart 2: Bar Chart (Market Context) ---
+        const ctxBar = document.getElementById('marketBarChart').getContext('2d');
+        new Chart(ctxBar, {
+            type: 'bar',
+            data: {
+                labels: ['Top 3 Incumbents', 'UniBank (#7)', 'Mid-Tier', 'Small Banks'],
+                datasets: [{
+                    label: 'Est. Market Influence (Assets)',
+                    data: [65, 10, 15, 10], // Conceptual data based on "Dominant" vs "7th"
+                    backgroundColor: [
+                        '#a8a29e', // Incumbents (Stone 400)
+                        '#ea580c', // UniBank (Orange 600 - Highlight)
+                        '#d6d3d1',
+                        '#e7e5e4'
+                    ],
+                    borderRadius: 4
+                }]
+            },
+            options: {
+                maintainAspectRatio: false,
+                indexAxis: 'y', // Horizontal bar
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        callbacks: {
+                            label: function(ctx) {
+                                return ctx.raw + '% (Illustrative)';
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    x: { display: false },
+                    y: { 
+                        grid: { display: false },
+                        ticks: { font: { weight: 'bold' } }
+                    }
+                }
+            }
+        });
+
+        // --- UI Interaction Logic ---
+
+        const detailTitle = document.getElementById('detailTitle');
+        const detailLevel = document.getElementById('detailLevel');
+        const detailContent = document.getElementById('detailContent');
+        const detailImplication = document.getElementById('detailImplication');
+        const navTabs = document.getElementById('navTabs');
+
+        function renderTabs() {
+            navTabs.innerHTML = '';
+            forcesData.forEach((force, index) => {
+                const btn = document.createElement('button');
+                btn.className = `flex-shrink-0 px-4 py-2 text-sm text-stone-600 rounded-md transition-colors inactive-tab`;
+                btn.innerHTML = `${force.icon} ${force.label}`;
+                btn.onclick = () => updateDetails(index);
+                btn.id = `tab-${index}`;
+                navTabs.appendChild(btn);
+            });
+        }
+
+        function updateDetails(index) {
+            const data = forcesData[index];
+            
+            // Update Text Content
+            detailTitle.innerHTML = `${data.icon} ${data.label}`;
+            detailLevel.innerText = data.level;
+            
+            // Color code the level badge
+            if(data.score >= 8) {
+                detailLevel.className = "px-3 py-1 rounded-full text-sm font-bold bg-red-100 text-red-800";
+            } else if (data.score <= 4) {
+                detailLevel.className = "px-3 py-1 rounded-full text-sm font-bold bg-green-100 text-green-800";
+            } else {
+                detailLevel.className = "px-3 py-1 rounded-full text-sm font-bold bg-yellow-100 text-yellow-800";
+            }
+
+            // Render factors list
+            detailContent.innerHTML = `
+                <ul class="space-y-3 mt-2">
+                    ${data.factors.map(f => `
+                        <li class="flex items-start">
+                            <span class="mr-2 text-stone-400 mt-1">•</span>
+                            <span class="text-stone-700 text-sm leading-relaxed">${f}</span>
+                        </li>
+                    `).join('')}
+                </ul>
+            `;
+            
+            detailImplication.innerText = data.implication;
+
+            // Update Active Tab State
+            forcesData.forEach((_, i) => {
+                const tab = document.getElementById(`tab-${i}`);
+                if (i === index) {
+                    tab.classList.remove('inactive-tab');
+                    tab.classList.add('active-tab');
+                } else {
+                    tab.classList.add('inactive-tab');
+                    tab.classList.remove('active-tab');
+                }
+            });
+        }
+
+        // Initialize
+        renderTabs();
+        updateDetails(1); // Start with 'Rivalry' as it's the most critical/high force
+        
+    </script>
+</body>
+</html>
